@@ -1,0 +1,64 @@
+To use the promise-based APIs:
+
+const fs = require('node:fs/promises');copy
+To use the callback and sync APIs:
+
+const fs = require('node:fs');copy
+All file system operations have synchronous, callback, and promise-based forms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).
+
+Promise example#
+Promise-based operations return a promise that is fulfilled when the asynchronous operation is complete.
+
+const { unlink } = require('node:fs/promises');
+
+(async function(path) {
+  try {
+    await unlink(path);
+    console.log(`successfully deleted ${path}`);
+  } catch (error) {
+    console.error('there was an error:', error.message);
+  }
+})('/tmp/hello');copy
+Callback example#
+The callback form takes a completion callback function as its last argument and invokes the operation asynchronously. The arguments passed to the completion callback depend on the method, but the first argument is always reserved for an exception. If the operation is completed successfully, then the first argument is null or undefined.
+
+const { unlink } = require('node:fs');
+
+unlink('/tmp/hello', (err) => {
+  if (err) throw err;
+  console.log('successfully deleted /tmp/hello');
+});copy
+The callback-based versions of the node:fs module APIs are preferable over the use of the promise APIs when maximal performance (both in terms of execution time and memory allocation) is required.
+
+Synchronous example#
+The synchronous APIs block the Node.js event loop and further JavaScript execution until the operation is complete. Exceptions are thrown immediately and can be handled using try…catch, or can be allowed to bubble up.
+
+const { unlinkSync } = require('node:fs');
+
+try {
+  unlinkSync('/tmp/hello');
+  console.log('successfully deleted /tmp/hello');
+} catch (err) {
+  // handle the error
+}copy
+Promises API#
+History
+The fs/promises API provides asynchronous file system methods that return promises.
+
+The promise APIs use the underlying Node.js threadpool to perform file system operations off the event loop thread. These operations are not synchronized or threadsafe. Care must be taken when performing multiple concurrent modifications on the same file or data corruption may occur.
+
+Class: FileHandle#
+Added in: v10.0.0
+A <FileHandle> object is an object wrapper for a numeric file descriptor.
+
+Instances of the <FileHandle> object are created by the fsPromises.open() method.
+
+All <FileHandle> objects are <EventEmitter>s.
+
+If a <FileHandle> is not closed using the filehandle.close() method, it will try to automatically close the file descriptor and emit a process warning, helping to prevent memory leaks. Please do not rely on this behavior because it can be unreliable and the file may not be closed. Instead, always explicitly close <FileHandle>s. Node.js may change this behavior in the future.
+
+Event: 'close'#
+Added in: v15.4.0
+The 'close' event is emitted when the <FileHandle> has been closed and can no longer be used.
+
+filehandle.appendFile(data[, options])
